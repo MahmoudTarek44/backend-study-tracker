@@ -1,12 +1,14 @@
-import { Component, computed, inject, input, signal } from "@angular/core";
+import { Component, computed, effect, inject, input, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
 import {
   allWeeks,
+  courseLabel,
   findWeek,
   isCalendarWeek,
   months,
   planRange,
+  type CourseLink,
 } from "./curriculum";
 import {
   parseSavedPlan,
@@ -14,6 +16,18 @@ import {
   type DisplayTask,
 } from "./study-progress";
 import { Theme } from "./theme";
+
+let studyBoardHasOpened = false;
+
+function scrollWeekDetailIntoView(): void {
+  if (!window.matchMedia("(max-width: 59.999rem)").matches) {
+    return;
+  }
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+  });
+}
 
 @Component({
   selector: "app-study-board",
@@ -74,6 +88,15 @@ import { Theme } from "./theme";
                 >
                   <span class="chip-num">{{ item.number }}</span>
                   <span class="chip-title">{{ item.title }}</span>
+                  <span class="chip-tags">
+                    @for (course of item.courses; track course.kind) {
+                      <span
+                        class="course-tag"
+                        [attr.data-course]="course.kind"
+                        >{{ courseLabel[course.kind] }}</span
+                      >
+                    }
+                  </span>
                   <span class="fraction">
                     @if (calendarWeek(item.id)) {
                       <span class="now-mark">Now </span>
@@ -103,20 +126,20 @@ import { Theme } from "./theme";
 
                 @if (panel.courses.length) {
                   <p class="courses">
-                    @for (
-                      course of panel.courses;
-                      track course.url;
-                      let last = $last
-                    ) {
-                      <a
-                        [href]="course.url"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        >{{ course.title }}</a
-                      >
-                      @if (!last) {
-                        <span aria-hidden="true"> · </span>
-                      }
+                    @for (course of panel.courses; track course.kind) {
+                      <span class="course-line">
+                        <span
+                          class="course-tag"
+                          [attr.data-course]="course.kind"
+                          >{{ courseLabel[course.kind] }}</span
+                        >
+                        <a
+                          [href]="course.url"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          >{{ course.title }}</a
+                        >
+                      </span>
                     }
                   </p>
                 }
@@ -125,7 +148,7 @@ import { Theme } from "./theme";
                   <span [style.width.%]="percent()"></span>
                 </div>
 
-                @if (nextTask() && panel.courses[0]; as course) {
+                @if (continueCourse(); as course) {
                   <a
                     class="continue"
                     [href]="course.url"
@@ -186,6 +209,13 @@ import { Theme } from "./theme";
                         <label [for]="'task-' + task.id">{{
                           task.title
                         }}</label>
+                      }
+                      @if (task.course) {
+                        <span
+                          class="course-tag"
+                          [attr.data-course]="task.course"
+                          >{{ courseLabel[task.course] }}</span
+                        >
                       }
                     </div>
 
@@ -284,12 +314,28 @@ export class StudyBoard {
 
   protected readonly months = months;
   protected readonly planRange = planRange;
+  protected readonly courseLabel = courseLabel;
   protected readonly noteTaskId = signal<string | null>(null);
   protected readonly renameTaskId = signal<string | null>(null);
   protected readonly footerMessage = signal("");
   protected readonly draftTitle = signal("");
   protected noteSeed = "";
   protected renameSeed = "";
+
+  constructor() {
+    effect(() => {
+      const id = this.weekId();
+      if (!id || typeof window === "undefined") {
+        return;
+      }
+      const opened = studyBoardHasOpened;
+      studyBoardHasOpened = true;
+      if (!opened) {
+        return;
+      }
+      scrollWeekDetailIntoView();
+    });
+  }
 
   protected readonly week = computed(() => findWeek(this.weekId()));
   protected readonly stage = computed(() => {
@@ -312,6 +358,17 @@ export class StudyBoard {
       all: tasks.length > 0 && done === tasks.length,
       some: done > 0 && done < tasks.length,
     };
+  });
+  protected readonly continueCourse = computed((): CourseLink | undefined => {
+    const week = this.week();
+    const task = this.nextTask();
+    if (!week || !task) {
+      return undefined;
+    }
+    return (
+      week.courses.find((course) => course.kind === task.course) ??
+      week.courses[0]
+    );
   });
   protected readonly nextOpenWeek = computed(() => {
     const weeks = allWeeks();

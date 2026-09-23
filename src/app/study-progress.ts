@@ -1,6 +1,6 @@
 import { Service, signal } from "@angular/core";
 
-import { StudyWeek } from "./curriculum";
+import { CourseKind, StudyWeek } from "./curriculum";
 
 const storageKey = "django-study-tracker.v1";
 
@@ -25,6 +25,7 @@ export interface DisplayTask {
   title: string;
   done: boolean;
   note: string;
+  course?: CourseKind;
 }
 
 function emptyPlan(): SavedPlan {
@@ -105,6 +106,7 @@ export class StudyProgress {
         title: saved.titles[id] ?? seed?.title ?? added?.title ?? "",
         done: saved.doneIds.includes(id),
         note: saved.notes[id] ?? "",
+        course: seed?.course,
       };
     });
   }

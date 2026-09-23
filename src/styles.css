@@ -317,8 +317,98 @@ footer p {
   color: var(--muted);
 }
 
+.courses {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.course-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .courses a {
   color: var(--label);
+}
+
+.course-tag {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  margin-top: 0.12rem;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid rgb(255 255 255 / 38%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+  backdrop-filter: blur(10px);
+}
+
+.course-tag[data-course="python"] {
+  border-color: rgb(214 244 226 / 42%);
+  background: rgb(110 196 150 / 16%);
+  color: #d8f6e6;
+}
+
+.course-tag[data-course="django"] {
+  border-color: rgb(214 244 238 / 42%);
+  background: rgb(120 210 196 / 16%);
+  color: #d7f7f1;
+}
+
+.course-tag[data-course="backend"] {
+  border-color: rgb(214 230 242 / 42%);
+  background: rgb(140 185 214 / 16%);
+  color: #dceaf4;
+}
+
+.course-tag[data-course="sql"] {
+  border-color: rgb(244 224 176 / 42%);
+  background: rgb(214 176 96 / 16%);
+  color: #f8ecc8;
+}
+
+:root[data-theme="light"] .hero .course-tag[data-course="python"],
+:root[data-theme="light"] .task .course-tag[data-course="python"],
+:root[data-theme="light"] .chip:not(.selected) .course-tag[data-course="python"] {
+  border-color: rgb(23 100 63 / 22%);
+  background: rgb(23 100 63 / 8%);
+  color: #145c38;
+}
+
+:root[data-theme="light"] .hero .course-tag[data-course="django"],
+:root[data-theme="light"] .task .course-tag[data-course="django"],
+:root[data-theme="light"] .chip:not(.selected) .course-tag[data-course="django"] {
+  border-color: rgb(14 110 98 / 20%);
+  background: rgb(14 110 98 / 8%);
+  color: #0c5c52;
+}
+
+:root[data-theme="light"] .hero .course-tag[data-course="backend"],
+:root[data-theme="light"] .task .course-tag[data-course="backend"],
+:root[data-theme="light"] .chip:not(.selected) .course-tag[data-course="backend"] {
+  border-color: rgb(36 78 104 / 20%);
+  background: rgb(36 78 104 / 8%);
+  color: #1c445c;
+}
+
+:root[data-theme="light"] .hero .course-tag[data-course="sql"],
+:root[data-theme="light"] .task .course-tag[data-course="sql"],
+:root[data-theme="light"] .chip:not(.selected) .course-tag[data-course="sql"] {
+  border-color: rgb(140 96 24 / 22%);
+  background: rgb(184 132 32 / 10%);
+  color: #6d4a10;
+}
+
+.course-line .course-tag {
+  margin-top: 0;
 }
 
 a {
@@ -415,40 +505,82 @@ ul {
   line-height: 1.35;
 }
 
-:root[data-theme="light"] input[type="checkbox"] {
-  border-color: var(--deep);
+.check label,
+.check .rename {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+:root[data-theme="light"] input[type="checkbox"]:not(:checked):not(:indeterminate) {
+  border-color: rgb(18 84 79 / 45%);
+  background: rgb(255 255 255 / 88%);
+  box-shadow: inset 0 0 0 1px rgb(18 84 79 / 6%);
 }
 
 input[type="checkbox"] {
-  display: grid;
-  width: 1.2rem;
-  height: 1.2rem;
-  margin-top: 0.12rem;
-  place-content: center;
-  border: 1.5px solid var(--sage);
-  border-radius: 0.35rem;
-  background: transparent;
+  position: relative;
+  flex: 0 0 1.35rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  min-width: 1.35rem;
+  margin: 0.08rem 0 0;
+  padding: 0;
+  border: 1.5px solid rgb(139 187 146 / 75%);
+  border-radius: 0.42rem;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 10%), transparent 58%),
+    transparent;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%);
   appearance: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 input[type="checkbox"]::after {
-  width: 0.28rem;
-  height: 0.55rem;
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: 0.34rem;
+  height: 0.62rem;
   border: solid var(--on-accent);
-  border-width: 0 2px 2px 0;
+  border-width: 0 2.5px 2.5px 0;
+  border-radius: 1px;
   content: "";
-  transform: rotate(45deg) scale(0);
+  opacity: 0;
+  transform: translate(-50%, -58%) rotate(45deg) scale(0.5);
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.45, 0.64, 1),
+    opacity 0.15s ease;
 }
 
 input[type="checkbox"]:checked,
 input[type="checkbox"]:indeterminate {
-  border-color: var(--leaf);
-  background: var(--leaf);
+  border-color: transparent;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 32%), transparent 48%),
+    var(--leaf);
+  box-shadow:
+    0 0 0 3px rgb(42 131 95 / 22%),
+    0 8px 16px rgb(42 131 95 / 28%);
 }
 
 input[type="checkbox"]:checked::after {
-  transform: rotate(45deg) scale(1);
-  animation: pop 0.22s ease;
+  opacity: 1;
+  transform: translate(-50%, -58%) rotate(45deg) scale(1);
+}
+
+input[type="checkbox"]:indeterminate::after {
+  top: 50%;
+  width: 0.62rem;
+  height: 0;
+  border-width: 0 0 2.5px;
+  border-radius: 999px;
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(0) scale(1);
 }
 
 .note-preview {
@@ -571,8 +703,11 @@ textarea {
 .chip {
   position: relative;
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 0.55rem;
+  grid-template-areas:
+    "num title score"
+    "num tags score";
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.28rem 0.55rem;
   align-items: center;
   margin-top: 0.4rem;
   padding: 0.55rem 0.7rem;
@@ -603,10 +738,30 @@ textarea {
   color: var(--on-accent);
 }
 
+.chip-num {
+  grid-area: num;
+}
+
 .chip-title {
+  grid-area: title;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.chip-tags {
+  display: flex;
+  grid-area: tags;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+}
+
+.chip-tags .course-tag {
+  margin-top: 0;
+}
+
+.chip .fraction {
+  grid-area: score;
 }
 
 .fraction {
@@ -672,15 +827,6 @@ textarea:focus-visible {
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-@keyframes pop {
-  from {
-    transform: rotate(45deg) scale(0.2);
-  }
-  to {
-    transform: rotate(45deg) scale(1);
   }
 }
 
