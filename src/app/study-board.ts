@@ -169,8 +169,14 @@ import { Theme } from './theme';
 
               <form class="add" (submit)="addTask($event)">
                 <label class="sr" for="new-task">Add a task</label>
-                <input id="new-task" name="title" placeholder="Add a task" autocomplete="off" />
-                <button type="submit">Add</button>
+                <input
+                  id="new-task"
+                  name="title"
+                  placeholder="Add a task for this week"
+                  autocomplete="off"
+                  (input)="onDraft($event)"
+                />
+                <button type="submit" [disabled]="!draftTitle().trim()">Add</button>
               </form>
             </section>
 
@@ -211,6 +217,7 @@ export class StudyBoard {
   protected readonly noteTaskId = signal<string | null>(null);
   protected readonly renameTaskId = signal<string | null>(null);
   protected readonly footerMessage = signal('');
+  protected readonly draftTitle = signal('');
   protected noteSeed = '';
   protected renameSeed = '';
 
@@ -305,6 +312,10 @@ export class StudyBoard {
     }
   }
 
+  protected onDraft(event: Event): void {
+    this.draftTitle.set((event.target as HTMLInputElement).value);
+  }
+
   protected addTask(event: Event): void {
     event.preventDefault();
     const week = this.week();
@@ -312,8 +323,9 @@ export class StudyBoard {
     if (!week) {
       return;
     }
-    this.progress.addTask(week, String(new FormData(form).get('title') ?? ''));
+    this.progress.addTask(week, this.draftTitle());
     form.reset();
+    this.draftTitle.set('');
   }
 
   protected exportPlan(): void {
