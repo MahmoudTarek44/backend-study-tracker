@@ -1,14 +1,436 @@
 @import 'tailwindcss';
 
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  --ink: #092328;
+  --deep: #12544f;
+  --leaf: #2a835f;
+  --sage: #8bbb92;
+  --text: #e8f6ea;
+  --muted: #9dccaa;
+  --line: rgb(139 187 146 / 28%);
+  color-scheme: dark;
+  font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+  font-size: 18px;
   line-height: 1.5;
-  color: #1c1917;
-  background-color: #fafaf9;
+  color: var(--text);
+  background:
+    radial-gradient(820px 420px at 0% -10%, rgb(18 84 79 / 85%), transparent 60%),
+    radial-gradient(640px 360px at 100% 0%, rgb(42 131 95 / 35%), transparent 55%),
+    var(--ink);
 }
 
 body {
   margin: 0;
   min-width: 320px;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.shell {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 3.5rem;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  animation: rise 0.45s ease both;
+}
+
+.eyebrow,
+.kicker,
+.month,
+.chip-num {
+  margin: 0;
+  color: var(--sage);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.range {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.score {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.score span {
+  color: var(--sage);
+  font-size: 1rem;
+}
+
+.layout {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.75rem;
+}
+
+.main {
+  order: 1;
+  min-width: 0;
+}
+
+.weeks {
+  order: 2;
+}
+
+.hero,
+.task,
+.chip {
+  border: 1px solid var(--line);
+  background: rgb(18 84 79 / 28%);
+}
+
+.hero {
+  padding: 1.5rem 1.35rem 1.35rem;
+  border-radius: 1.25rem;
+  animation: rise 0.5s ease both;
+}
+
+h1 {
+  margin: 0.35rem 0 0;
+  max-width: 18ch;
+  font-size: clamp(1.9rem, 4vw, 2.7rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+  animation: rise 0.4s ease both;
+}
+
+.meta,
+.courses,
+.note-preview,
+footer p {
+  margin: 0.7rem 0 0;
+  color: var(--muted);
+}
+
+.courses a {
+  color: var(--sage);
+}
+
+a {
+  text-underline-offset: 0.18em;
+}
+
+.meter {
+  height: 0.35rem;
+  margin-top: 1.15rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(9 35 40 / 65%);
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--deep), var(--leaf) 55%, var(--sage));
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.continue {
+  display: inline-flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  background: var(--leaf);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 10px 28px rgb(42 131 95 / 28%);
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.continue:hover {
+  background: #33956c;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgb(42 131 95 / 40%);
+}
+
+.checklist {
+  margin-top: 1.25rem;
+}
+
+.week-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.week-head .check span {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task {
+  margin-top: 0.65rem;
+  padding: 0.9rem 0.95rem;
+  border-radius: 1rem;
+  animation: rise 0.4s ease both;
+  transition: border-color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+}
+
+.task.done {
+  opacity: 0.62;
+}
+
+.task.done .check label {
+  color: var(--sage);
+  text-decoration: line-through;
+  text-decoration-color: rgb(139 187 146 / 70%);
+}
+
+.check {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+input[type='checkbox'] {
+  display: grid;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.12rem;
+  place-content: center;
+  border: 1.5px solid var(--sage);
+  border-radius: 0.35rem;
+  background: transparent;
+  appearance: none;
+}
+
+input[type='checkbox']::after {
+  width: 0.28rem;
+  height: 0.55rem;
+  border: solid var(--text);
+  border-width: 0 2px 2px 0;
+  content: '';
+  transform: rotate(45deg) scale(0);
+}
+
+input[type='checkbox']:checked,
+input[type='checkbox']:indeterminate {
+  border-color: var(--leaf);
+  background: var(--leaf);
+}
+
+input[type='checkbox']:checked::after {
+  transform: rotate(45deg) scale(1);
+  animation: pop 0.22s ease;
+}
+
+.note-preview {
+  margin-left: 1.95rem;
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  margin: 0.45rem 0 0 1.95rem;
+}
+
+.actions button,
+.add button,
+footer button,
+.import {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sage);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.actions button:hover,
+.add button:hover,
+footer button:hover,
+.import:hover {
+  color: var(--text);
+}
+
+.actions button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rename,
+.add input,
+textarea {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+textarea {
+  display: block;
+  margin-top: 0.65rem;
+  padding: 0.35rem 0;
+  resize: vertical;
+  animation: rise 0.25s ease both;
+}
+
+.add {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.85rem;
+}
+
+.weeks h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+}
+
+.month {
+  margin: 1rem 0 0.35rem;
+}
+
+.chip {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.55rem;
+  align-items: center;
+  margin-top: 0.4rem;
+  padding: 0.55rem 0.7rem;
+  overflow: hidden;
+  border-radius: 0.8rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.chip:hover {
+  transform: translateX(4px);
+  color: var(--text);
+}
+
+.chip.selected {
+  border-color: var(--leaf);
+  background: var(--deep);
+  color: var(--text);
+}
+
+.chip-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fraction {
+  color: var(--sage);
+  font-size: 0.8rem;
+}
+
+.now-mark {
+  color: var(--sage);
+}
+
+footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.import input,
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: 3px;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: rotate(45deg) scale(0.2);
+  }
+  to {
+    transform: rotate(45deg) scale(1);
+  }
+}
+
+@media (min-width: 60rem) {
+  .layout {
+    grid-template-columns: 18rem minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .main,
+  .weeks {
+    order: 0;
+  }
+
+  .weeks {
+    position: sticky;
+    top: 1.25rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .continue {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

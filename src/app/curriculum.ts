@@ -225,3 +225,67 @@ export const months: StudyMonth[] = [
     ],
   },
 ];
+
+export const weekBounds: Record<string, { start: string; end: string }> = {
+  'week-1': { start: '2026-09-28', end: '2026-10-04' },
+  'week-2': { start: '2026-10-05', end: '2026-10-11' },
+  'week-3': { start: '2026-10-12', end: '2026-10-18' },
+  'week-4': { start: '2026-10-19', end: '2026-10-25' },
+  'week-5': { start: '2026-10-26', end: '2026-11-01' },
+  'week-6': { start: '2026-11-02', end: '2026-11-08' },
+  'week-7': { start: '2026-11-09', end: '2026-11-15' },
+  'week-8': { start: '2026-11-16', end: '2026-11-22' },
+  'week-9': { start: '2026-11-23', end: '2026-11-29' },
+  'week-10': { start: '2026-11-30', end: '2026-12-06' },
+  'week-11': { start: '2026-12-07', end: '2026-12-13' },
+  'week-12': { start: '2026-12-14', end: '2026-12-20' },
+};
+
+export function allWeeks(): StudyWeek[] {
+  return months.flatMap((month) => month.weeks);
+}
+
+export function findWeek(id: string): StudyWeek | undefined {
+  return allWeeks().find((week) => week.id === id);
+}
+
+export function monthTitleFor(weekId: string): string {
+  return months.find((month) => month.weeks.some((week) => week.id === weekId))?.title ?? '';
+}
+
+export function toIsoDate(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+export function isCalendarWeek(weekId: string, date: Date): boolean {
+  const bounds = weekBounds[weekId];
+  if (!bounds) {
+    return false;
+  }
+  const iso = toIsoDate(date);
+  return iso >= bounds.start && iso <= bounds.end;
+}
+
+export function openingWeekId(today: Date, isComplete: (weekId: string) => boolean): string {
+  const weeks = allWeeks();
+  const first = weeks[0];
+  const last = weeks[weeks.length - 1];
+  const calendar = weeks.find((week) => isCalendarWeek(week.id, today));
+
+  if (toIsoDate(today) < weekBounds[first.id].start) {
+    return weeks.find((week) => !isComplete(week.id))?.id ?? first.id;
+  }
+
+  if (calendar && !isComplete(calendar.id)) {
+    return calendar.id;
+  }
+
+  const startAt = calendar ? weeks.indexOf(calendar) : weeks.length;
+  return (
+    weeks.slice(startAt).find((week) => !isComplete(week.id))?.id ??
+    weeks.find((week) => !isComplete(week.id))?.id ??
+    last.id
+  );
+}
