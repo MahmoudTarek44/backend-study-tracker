@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { allWeeks, findWeek, isCalendarWeek, months, planRange } from './curriculum';
 import { parseSavedPlan, StudyProgress, type DisplayTask } from './study-progress';
+import { Theme } from './theme';
 
 @Component({
   selector: 'app-study-board',
@@ -15,7 +16,32 @@ import { parseSavedPlan, StudyProgress, type DisplayTask } from './study-progres
             <p class="eyebrow">Backend study</p>
             <p class="range">{{ planRange }}</p>
           </div>
-          <p class="score">{{ weekState().done }}<span>/{{ weekState().total }}</span></p>
+          <div class="top-end">
+            <button
+              type="button"
+              class="theme-switch"
+              role="switch"
+              [attr.aria-checked]="theme.light()"
+              [attr.aria-label]="theme.light() ? 'Switch to dark mode' : 'Switch to light mode'"
+              (click)="theme.toggle()"
+            >
+              <span class="theme-track" aria-hidden="true">
+                <span class="theme-stars"></span>
+                <span class="theme-knob">
+                  <svg class="icon-moon" viewBox="0 0 24 24">
+                    <path d="M15.8 3.2a8.2 8.2 0 1 0 5.4 14.4A7.2 7.2 0 0 1 15.8 3.2z" />
+                  </svg>
+                  <svg class="icon-sun" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3.1" />
+                    <path
+                      d="M12 3.1v2M12 18.9v2M3.1 12h2M18.9 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"
+                    />
+                  </svg>
+                </span>
+              </span>
+            </button>
+            <p class="score">{{ weekState().done }}<span>/{{ weekState().total }}</span></p>
+          </div>
         </header>
 
         <div class="layout">
@@ -178,6 +204,7 @@ export class StudyBoard {
   readonly weekId = input.required<string>();
 
   private readonly progress = inject(StudyProgress);
+  protected readonly theme = inject(Theme);
 
   protected readonly months = months;
   protected readonly planRange = planRange;

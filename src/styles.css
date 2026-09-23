@@ -7,16 +7,42 @@
   --sage: #8bbb92;
   --text: #e8f6ea;
   --muted: #9dccaa;
+  --label: var(--sage);
   --line: rgb(139 187 146 / 28%);
+  --surface: rgb(18 84 79 / 28%);
+  --track: rgb(9 35 40 / 65%);
+  --on-accent: #e8f6ea;
+  --page:
+    radial-gradient(820px 420px at 0% -10%, rgb(18 84 79 / 85%), transparent 60%),
+    radial-gradient(640px 360px at 100% 0%, rgb(42 131 95 / 35%), transparent 55%),
+    var(--ink);
   color-scheme: dark;
   font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
   font-size: 18px;
   line-height: 1.5;
   color: var(--text);
-  background:
-    radial-gradient(820px 420px at 0% -10%, rgb(18 84 79 / 85%), transparent 60%),
-    radial-gradient(640px 360px at 100% 0%, rgb(42 131 95 / 35%), transparent 55%),
-    var(--ink);
+  background: var(--page);
+}
+
+:root[data-theme='light'] .hero,
+:root[data-theme='light'] .task,
+:root[data-theme='light'] .chip:not(.selected) {
+  box-shadow: 0 12px 28px rgb(18 84 79 / 7%);
+}
+
+:root[data-theme='light'] {
+  --text: var(--ink);
+  --muted: var(--deep);
+  --label: var(--deep);
+  --line: rgb(18 84 79 / 18%);
+  --surface: rgb(255 255 255 / 84%);
+  --track: rgb(139 187 146 / 50%);
+  --on-accent: #f4fbf6;
+  --page:
+    radial-gradient(860px 440px at 0% -12%, rgb(139 187 146 / 75%), transparent 62%),
+    radial-gradient(680px 380px at 100% 0%, rgb(42 131 95 / 18%), transparent 58%),
+    #eef6f1;
+  color-scheme: light;
 }
 
 body {
@@ -38,8 +64,9 @@ textarea {
 
 .top {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   gap: 1rem;
   animation: rise 0.45s ease both;
 }
@@ -49,7 +76,7 @@ textarea {
 .month,
 .chip-num {
   margin: 0;
-  color: var(--sage);
+  color: var(--label);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -69,9 +96,136 @@ textarea {
   line-height: 1;
 }
 
+.top-end {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-left: auto;
+}
+
 .score span {
-  color: var(--sage);
+  color: var(--label);
   font-size: 1rem;
+}
+
+.theme-switch {
+  position: relative;
+  width: 4.55rem;
+  height: 2.45rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 22% 50%, rgb(139 187 146 / 28%), transparent 46%),
+    linear-gradient(105deg, #071c20, var(--deep) 78%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 6%),
+    0 8px 18px rgb(9 35 40 / 28%);
+  cursor: pointer;
+  flex: none;
+  transition: background 0.45s ease, box-shadow 0.45s ease, border-color 0.45s ease;
+}
+
+.theme-switch:active .theme-knob {
+  scale: 0.92;
+}
+
+.theme-track,
+.theme-stars,
+.theme-knob {
+  position: absolute;
+}
+
+.theme-track {
+  inset: 0;
+  border-radius: inherit;
+}
+
+.theme-stars {
+  inset: 0;
+  background:
+    radial-gradient(circle at 74% 34%, var(--on-accent) 1.1px, transparent 1.5px),
+    radial-gradient(circle at 64% 70%, var(--sage) 1px, transparent 1.4px),
+    radial-gradient(circle at 84% 64%, var(--on-accent) 0.8px, transparent 1.2px);
+  opacity: 0.9;
+  transition: opacity 0.35s ease;
+}
+
+.theme-knob {
+  top: 0.22rem;
+  left: 0.22rem;
+  display: grid;
+  width: 1.95rem;
+  height: 1.95rem;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #ffffff, var(--sage) 58%, var(--leaf));
+  box-shadow:
+    0 6px 14px rgb(9 35 40 / 35%),
+    inset 0 0 0 1px rgb(255 255 255 / 45%);
+  transition:
+    left 0.5s cubic-bezier(0.34, 1.35, 0.64, 1),
+    transform 0.5s cubic-bezier(0.34, 1.35, 0.64, 1),
+    background 0.4s ease;
+}
+
+.icon-moon,
+.icon-sun {
+  position: absolute;
+  inset: 0.42rem;
+  width: auto;
+  height: auto;
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.icon-moon {
+  fill: var(--deep);
+  opacity: 1;
+  transform: none;
+}
+
+.icon-sun {
+  fill: none;
+  stroke: var(--deep);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  opacity: 0;
+  transform: rotate(-40deg) scale(0.55);
+}
+
+.icon-sun circle {
+  fill: var(--deep);
+  stroke: none;
+}
+
+:root[data-theme='light'] .theme-switch {
+  background:
+    radial-gradient(circle at 78% 50%, rgb(42 131 95 / 22%), transparent 48%),
+    linear-gradient(105deg, #f7fbf8, #cfe4d4 80%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 80%),
+    0 8px 18px rgb(18 84 79 / 12%);
+}
+
+:root[data-theme='light'] .theme-stars {
+  opacity: 0;
+}
+
+:root[data-theme='light'] .theme-knob {
+  left: calc(100% - 1.95rem - 0.22rem);
+  background: radial-gradient(circle at 32% 30%, #ffffff, #d7efe0 46%, var(--leaf));
+  transform: rotate(16deg);
+}
+
+:root[data-theme='light'] .icon-moon {
+  opacity: 0;
+  transform: rotate(24deg) scale(0.55);
+}
+
+:root[data-theme='light'] .icon-sun {
+  opacity: 1;
+  transform: none;
 }
 
 .layout {
@@ -93,7 +247,7 @@ textarea {
 .task,
 .chip {
   border: 1px solid var(--line);
-  background: rgb(18 84 79 / 28%);
+  background: var(--surface);
 }
 
 .hero {
@@ -121,7 +275,7 @@ footer p {
 }
 
 .courses a {
-  color: var(--sage);
+  color: var(--label);
 }
 
 a {
@@ -133,7 +287,7 @@ a {
   margin-top: 1.15rem;
   overflow: hidden;
   border-radius: 999px;
-  background: rgb(9 35 40 / 65%);
+  background: var(--track);
 }
 
 .meter span {
@@ -151,7 +305,7 @@ a {
   padding: 0.85rem 1.4rem;
   border-radius: 999px;
   background: var(--leaf);
-  color: var(--text);
+  color: var(--on-accent);
   font-weight: 600;
   text-decoration: none;
   box-shadow: 0 10px 28px rgb(42 131 95 / 28%);
@@ -199,7 +353,7 @@ ul {
 }
 
 .task.done .check label {
-  color: var(--sage);
+  color: var(--label);
   text-decoration: line-through;
   text-decoration-color: rgb(139 187 146 / 70%);
 }
@@ -210,6 +364,10 @@ ul {
   align-items: flex-start;
   font-size: 1.05rem;
   line-height: 1.35;
+}
+
+:root[data-theme='light'] input[type='checkbox'] {
+  border-color: var(--deep);
 }
 
 input[type='checkbox'] {
@@ -227,7 +385,7 @@ input[type='checkbox'] {
 input[type='checkbox']::after {
   width: 0.28rem;
   height: 0.55rem;
-  border: solid var(--text);
+  border: solid var(--on-accent);
   border-width: 0 2px 2px 0;
   content: '';
   transform: rotate(45deg) scale(0);
@@ -263,7 +421,7 @@ footer button,
   padding: 0;
   border: 0;
   background: none;
-  color: var(--sage);
+  color: var(--label);
   font: inherit;
   font-size: 0.92rem;
   cursor: pointer;
@@ -340,7 +498,13 @@ textarea {
 .chip.selected {
   border-color: var(--leaf);
   background: var(--deep);
-  color: var(--text);
+  color: var(--on-accent);
+}
+
+.chip.selected .chip-num,
+.chip.selected .fraction,
+.chip.selected .now-mark {
+  color: var(--on-accent);
 }
 
 .chip-title {
@@ -350,12 +514,12 @@ textarea {
 }
 
 .fraction {
-  color: var(--sage);
+  color: var(--label);
   font-size: 0.8rem;
 }
 
 .now-mark {
-  color: var(--sage);
+  color: var(--label);
 }
 
 footer {
@@ -379,7 +543,7 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--sage);
+  outline: 2px solid var(--label);
   outline-offset: 3px;
 }
 
