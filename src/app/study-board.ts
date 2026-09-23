@@ -1,3 +1,9 @@
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDropList,
+} from "@angular/cdk/drag-drop";
 import { Component, computed, effect, inject, input, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
 
@@ -8,13 +14,10 @@ import {
   isCalendarWeek,
   months,
   planRange,
+  type CourseKind,
   type CourseLink,
 } from "./curriculum";
-import {
-  parseSavedPlan,
-  StudyProgress,
-  type DisplayTask,
-} from "./study-progress";
+import { StudyProgress, type DisplayTask } from "./study-progress";
 import { Theme } from "./theme";
 
 let studyBoardHasOpened = false;
@@ -31,13 +34,13 @@ function scrollWeekDetailIntoView(): void {
 
 @Component({
   selector: "app-study-board",
-  imports: [RouterLink],
+  imports: [RouterLink, CdkDropList, CdkDrag, CdkDragHandle],
   template: `
     @if (week(); as current) {
       <div class="shell">
         <header class="top">
-          <div>
-            <p class="eyebrow">Backend study</p>
+          <div class="masthead">
+            <p class="brand">Backend study</p>
             <p class="range">{{ planRange }}</p>
           </div>
           <div class="top-end">
@@ -68,9 +71,6 @@ function scrollWeekDetailIntoView(): void {
                 </span>
               </span>
             </button>
-            <p class="score">
-              {{ weekState().done }}<span>/{{ weekState().total }}</span>
-            </p>
           </div>
         </header>
 
@@ -111,13 +111,28 @@ function scrollWeekDetailIntoView(): void {
           <div class="main">
             @for (panel of stage(); track panel.id) {
               <section class="hero" aria-labelledby="next-task">
-                @if (nextTask(); as task) {
-                  <p class="kicker">Up next</p>
-                  <h1 id="next-task">{{ task.title }}</h1>
-                } @else {
-                  <p class="kicker">This week</p>
-                  <h1 id="next-task">Week {{ panel.number }} is finished.</h1>
-                }
+                <div class="hero-title">
+                  <div>
+                    @if (nextTask(); as task) {
+                      <p class="kicker">Up next</p>
+                      <h1 id="next-task">{{ task.title }}</h1>
+                    } @else {
+                      <p class="kicker">This week</p>
+                      <h1 id="next-task">Week {{ panel.number }} is finished.</h1>
+                    }
+                  </div>
+                  <p
+                    class="score"
+                    [attr.aria-label]="
+                      weekState().done +
+                      ' of ' +
+                      weekState().total +
+                      ' tasks done'
+                    "
+                  >
+                    {{ weekState().done }}<span>/{{ weekState().total }}</span>
+                  </p>
+                </div>
 
                 <p class="meta">
                   Week {{ panel.number }} · {{ panel.title }} ·
@@ -177,94 +192,162 @@ function scrollWeekDetailIntoView(): void {
                 </label>
               </div>
 
-              <ul>
-                @for (
-                  task of tasks();
-                  track task.id;
-                  let first = $first;
-                  let last = $last;
-                  let index = $index
-                ) {
+              <ul class="tasks" cdkDropList (cdkDropListDropped)="drop($event)">
+                @for (task of tasks(); track task.id; let index = $index) {
                   <li
                     class="task"
+                    cdkDrag
+                    cdkDragBoundary=".tasks"
                     [class.done]="task.done"
                     [style.animation-delay]="index * 45 + 'ms'"
                   >
-                    <div class="check">
-                      <input
-                        type="checkbox"
-                        [id]="'task-' + task.id"
-                        [checked]="task.done"
-                        (change)="onTaskToggle(task.id, $event)"
-                      />
-                      @if (renameTaskId() === task.id) {
-                        <input
-                          class="rename"
-                          [value]="renameSeed"
-                          [attr.aria-label]="'Rename ' + task.title"
-                          (blur)="saveRename(task.id, $event)"
-                          (keydown.enter)="saveRename(task.id, $event)"
-                        />
-                      } @else {
-                        <label [for]="'task-' + task.id">{{
-                          task.title
-                        }}</label>
-                      }
-                      @if (task.course) {
-                        <span
-                          class="course-tag"
-                          [attr.data-course]="task.course"
-                          >{{ courseLabel[task.course] }}</span
+                    <div class="task-top">
+                      <button
+                        type="button"
+                        class="grip"
+                        cdkDragHandle
+                        aria-label="Drag to reorder"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="9" cy="7" r="1.7" />
+                          <circle cx="15" cy="7" r="1.7" />
+                          <circle cx="9" cy="12" r="1.7" />
+                          <circle cx="15" cy="12" r="1.7" />
+                          <circle cx="9" cy="17" r="1.7" />
+                          <circle cx="15" cy="17" r="1.7" />
+                        </svg>
+                      </button>
+                      <div class="task-main">
+                        <div class="check">
+                          <input
+                            type="checkbox"
+                            [id]="'task-' + task.id"
+                            [checked]="task.done"
+                            (change)="onTaskToggle(task.id, $event)"
+                          />
+                          @if (renameTaskId() === task.id) {
+                            <input
+                              class="rename"
+                              [value]="renameDraft()"
+                              [attr.aria-label]="'Rename ' + task.title"
+                              (input)="onRenameDraft($event)"
+                              (keydown.enter)="saveRename(task.id)"
+                              (keydown.escape)="cancelRename()"
+                            />
+                          } @else {
+                            <label [for]="'task-' + task.id">{{
+                              task.title
+                            }}</label>
+                          }
+                        </div>
+
+                        <div class="actions">
+                          @if (task.description) {
+                            <button
+                              type="button"
+                              class="about"
+                              [attr.aria-expanded]="detailId() === task.id"
+                              [attr.aria-controls]="'detail-' + task.id"
+                              (click)="toggleDetail(task.id)"
+                            >
+                              About
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M6 9l6 6 6-6" />
+                              </svg>
+                            </button>
+                          }
+                          @if (renameTaskId() === task.id) {
+                            <button
+                              type="button"
+                              (mousedown)="$event.preventDefault()"
+                              (click)="saveRename(task.id)"
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              (mousedown)="$event.preventDefault()"
+                              (click)="cancelRename()"
+                            >
+                              Cancel
+                            </button>
+                          } @else {
+                            <button
+                              type="button"
+                              (click)="openRename(task)"
+                            >
+                              Rename
+                            </button>
+                          }
+                        </div>
+
+                        @if (task.description) {
+                          <div
+                            class="detail"
+                            [class.open]="detailId() === task.id"
+                            [id]="'detail-' + task.id"
+                            [attr.aria-hidden]="detailId() === task.id ? null : true"
+                          >
+                            <div class="detail-body">
+                              <p>{{ task.description }}</p>
+                            </div>
+                          </div>
+                        }
+                      </div>
+
+                      <div class="task-side">
+                        @if (task.course) {
+                          <span
+                            class="course-tag"
+                            [attr.data-course]="task.course"
+                            >{{ courseLabel[task.course] }}</span
+                          >
+                        }
+                        <button
+                          type="button"
+                          class="remove"
+                          [attr.aria-label]="'Remove ' + task.title"
+                          (click)="remove(task.id)"
                         >
-                      }
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 7h16" />
+                            <path d="M9 7V5h6v2" />
+                            <path d="M8 7l1 13h6l1-13" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
-
-                    @if (task.note && noteTaskId() !== task.id) {
-                      <p class="note-preview">{{ task.note }}</p>
-                    }
-
-                    <div class="actions">
-                      <button type="button" (click)="openNote(task)">
-                        Note
-                      </button>
-                      <button type="button" (click)="openRename(task)">
-                        Rename
-                      </button>
-                      <button
-                        type="button"
-                        (click)="move(task.id, -1)"
-                        [disabled]="first"
-                      >
-                        Up
-                      </button>
-                      <button
-                        type="button"
-                        (click)="move(task.id, 1)"
-                        [disabled]="last"
-                      >
-                        Down
-                      </button>
-                      <button type="button" (click)="remove(task.id)">
-                        Remove
-                      </button>
-                    </div>
-
-                    @if (noteTaskId() === task.id) {
-                      <textarea
-                        rows="3"
-                        [attr.aria-label]="'Note for ' + task.title"
-                        [value]="noteSeed"
-                        (input)="onNote(task.id, $event)"
-                      ></textarea>
-                    }
                   </li>
                 }
               </ul>
 
               <form class="add" (submit)="addTask($event)">
+                <div
+                  class="add-courses"
+                  role="radiogroup"
+                  aria-label="Course for the new task"
+                >
+                  @for (kind of addCourses(); track kind) {
+                    <label
+                      class="course-tag course-pick"
+                      [class.picked]="addCourse() === kind"
+                      [attr.data-course]="kind"
+                    >
+                      <input
+                        type="radio"
+                        name="new-course"
+                        [value]="kind"
+                        [checked]="addCourse() === kind"
+                        (change)="draftCourse.set(kind)"
+                      />
+                      {{ courseLabel[kind] }}
+                    </label>
+                  }
+                </div>
                 <label class="sr" for="new-task">Add a task</label>
                 <input
                   id="new-task"
+                  class="add-title"
                   name="title"
                   placeholder="Add a task for this week"
                   autocomplete="off"
@@ -275,21 +358,6 @@ function scrollWeekDetailIntoView(): void {
                 </button>
               </form>
             </section>
-
-            <footer>
-              <button type="button" (click)="exportPlan()">Export</button>
-              <label class="import">
-                Import
-                <input
-                  type="file"
-                  accept="application/json,.json"
-                  (change)="importPlan($event)"
-                />
-              </label>
-              @if (footerMessage()) {
-                <p>{{ footerMessage() }}</p>
-              }
-            </footer>
           </div>
         </div>
       </div>
@@ -315,12 +383,11 @@ export class StudyBoard {
   protected readonly months = months;
   protected readonly planRange = planRange;
   protected readonly courseLabel = courseLabel;
-  protected readonly noteTaskId = signal<string | null>(null);
+  protected readonly detailId = signal<string | null>(null);
   protected readonly renameTaskId = signal<string | null>(null);
-  protected readonly footerMessage = signal("");
+  protected readonly renameDraft = signal("");
   protected readonly draftTitle = signal("");
-  protected noteSeed = "";
-  protected renameSeed = "";
+  protected readonly draftCourse = signal<CourseKind | null>(null);
 
   constructor() {
     effect(() => {
@@ -370,6 +437,18 @@ export class StudyBoard {
       week.courses[0]
     );
   });
+  protected readonly addCourses = computed(() => {
+    const week = this.week();
+    return week?.courses.map((course) => course.kind) ?? [];
+  });
+  protected readonly addCourse = computed(() => {
+    const choices = this.addCourses();
+    const picked = this.draftCourse();
+    if (picked && choices.includes(picked)) {
+      return picked;
+    }
+    return choices[0];
+  });
   protected readonly nextOpenWeek = computed(() => {
     const weeks = allWeeks();
     const index = weeks.findIndex((week) => week.id === this.weekId());
@@ -411,39 +490,53 @@ export class StudyBoard {
     }
   }
 
-  protected openNote(task: DisplayTask): void {
-    this.noteSeed = task.note;
-    this.renameTaskId.set(null);
-    this.noteTaskId.update((current) => (current === task.id ? null : task.id));
+  protected toggleDetail(taskId: string): void {
+    this.detailId.update((current) => (current === taskId ? null : taskId));
   }
 
   protected openRename(task: DisplayTask): void {
-    this.renameSeed = task.title;
-    this.noteTaskId.set(null);
+    this.renameDraft.set(task.title);
     this.renameTaskId.set(task.id);
   }
 
-  protected onNote(taskId: string, event: Event): void {
-    this.progress.setNote(taskId, (event.target as HTMLTextAreaElement).value);
+  protected onRenameDraft(event: Event): void {
+    this.renameDraft.set((event.target as HTMLInputElement).value);
   }
 
-  protected saveRename(taskId: string, event: Event): void {
-    this.progress.rename(taskId, (event.target as HTMLInputElement).value);
+  protected saveRename(taskId: string): void {
+    const title = this.renameDraft().trim();
+    if (!title) {
+      return;
+    }
+    this.progress.rename(taskId, title);
     this.renameTaskId.set(null);
   }
 
-  protected move(taskId: string, direction: -1 | 1): void {
-    const week = this.week();
-    if (week) {
-      this.progress.moveTask(week, taskId, direction);
-    }
+  protected cancelRename(): void {
+    this.renameTaskId.set(null);
   }
 
   protected remove(taskId: string): void {
     const week = this.week();
-    if (week) {
-      this.progress.removeTask(week, taskId);
+    if (!week) {
+      return;
     }
+    if (this.detailId() === taskId) {
+      this.detailId.set(null);
+    }
+    if (this.renameTaskId() === taskId) {
+      this.renameTaskId.set(null);
+    }
+    this.progress.removeTask(week, taskId);
+  }
+
+  protected drop(event: CdkDragDrop<DisplayTask[]>): void {
+    const week = this.week();
+    const task = this.tasks()[event.previousIndex];
+    if (!week || !task || event.previousIndex === event.currentIndex) {
+      return;
+    }
+    this.progress.reorder(week, task.id, event.currentIndex);
   }
 
   protected onDraft(event: Event): void {
@@ -453,42 +546,17 @@ export class StudyBoard {
   protected addTask(event: Event): void {
     event.preventDefault();
     const week = this.week();
+    const course = this.addCourse();
     const form = event.target as HTMLFormElement;
-    if (!week) {
+    const title = this.draftTitle().trim();
+    if (!week || !course || !title) {
       return;
     }
-    this.progress.addTask(week, this.draftTitle());
-    form.reset();
+    this.progress.addTask(week, title, course);
+    const titleInput = form.querySelector<HTMLInputElement>(".add-title");
+    if (titleInput) {
+      titleInput.value = "";
+    }
     this.draftTitle.set("");
-  }
-
-  protected exportPlan(): void {
-    const blob = new Blob([JSON.stringify(this.progress.snapshot(), null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "backend-study-tracker.json";
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
-  protected importPlan(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    input.value = "";
-    if (!file) {
-      return;
-    }
-    void file.text().then((raw) => {
-      const plan = parseSavedPlan(raw);
-      if (!plan) {
-        this.footerMessage.set("That file could not be read.");
-        return;
-      }
-      this.progress.replace(plan);
-      this.footerMessage.set("Progress replaced from the file.");
-    });
   }
 }

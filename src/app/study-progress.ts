@@ -8,6 +8,7 @@ export interface AddedTask {
   id: string;
   weekId: string;
   title: string;
+  course?: CourseKind;
 }
 
 export interface SavedPlan {
@@ -24,8 +25,8 @@ export interface DisplayTask {
   id: string;
   title: string;
   done: boolean;
-  note: string;
   course?: CourseKind;
+  description?: string;
 }
 
 function emptyPlan(): SavedPlan {
@@ -105,8 +106,8 @@ export class StudyProgress {
         id,
         title: saved.titles[id] ?? seed?.title ?? added?.title ?? "",
         done: saved.doneIds.includes(id),
-        note: saved.notes[id] ?? "",
-        course: seed?.course,
+        course: seed?.course ?? added?.course,
+        description: seed?.description,
       };
     });
   }
@@ -134,17 +135,6 @@ export class StudyProgress {
     });
   }
 
-  setNote(id: string, note: string): void {
-    const saved = this.state();
-    const notes = { ...saved.notes };
-    if (note) {
-      notes[id] = note;
-    } else {
-      delete notes[id];
-    }
-    this.write({ ...saved, notes });
-  }
-
   rename(id: string, title: string): void {
     const trimmed = title.trim();
     if (!trimmed) {
@@ -154,7 +144,7 @@ export class StudyProgress {
     this.write({ ...saved, titles: { ...saved.titles, [id]: trimmed } });
   }
 
-  addTask(week: StudyWeek, title: string): void {
+  addTask(week: StudyWeek, title: string, course: CourseKind): void {
     const trimmed = title.trim();
     if (!trimmed) {
       return;
@@ -164,7 +154,10 @@ export class StudyProgress {
     const ids = this.tasksFor(week).map((task) => task.id);
     this.write({
       ...saved,
-      added: [...saved.added, { id, weekId: week.id, title: trimmed }],
+      added: [
+        ...saved.added,
+        { id, weekId: week.id, title: trimmed, course },
+      ],
       order: { ...saved.order, [week.id]: [...ids, id] },
     });
   }
@@ -192,19 +185,19 @@ export class StudyProgress {
     });
   }
 
-  moveTask(week: StudyWeek, id: string, direction: -1 | 1): void {
+  reorder(week: StudyWeek, id: string, toIndex: number): void {
     const ids = this.tasksFor(week).map((task) => task.id);
-    const index = ids.indexOf(id);
-    const target = index + direction;
-    if (index < 0 || target < 0 || target >= ids.length) {
+    const from = ids.indexOf(id);
+    if (from < 0 || toIndex < 0 || toIndex >= ids.length || from === toIndex) {
       return;
     }
     const next = [...ids];
-    const [moved] = next.splice(index, 1);
-    next.splice(target, 0, moved);
+    const [moved] = next.splice(from, 1);
+    next.splice(toIndex, 0, moved);
+    const saved = this.state();
     this.write({
-      ...this.state(),
-      order: { ...this.state().order, [week.id]: next },
+      ...saved,
+      order: { ...saved.order, [week.id]: next },
     });
   }
 

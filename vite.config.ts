@@ -12,6 +12,10 @@ export default defineConfig(({ mode }) => ({
   },
   resolve: {
     mainFields: ["module"],
+    dedupe: ["@angular/core"],
+  },
+  optimizeDeps: {
+    exclude: ["@angular/cdk"],
   },
   plugins: [
     analog({

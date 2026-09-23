@@ -82,9 +82,35 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
+  align-items: flex-end;
+  gap: 1rem 1.5rem;
   animation: rise 0.45s ease both;
+}
+
+.masthead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.brand {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.brand::before {
+  content: "";
+  display: block;
+  width: 2.4rem;
+  height: 0.22rem;
+  margin-bottom: 0.7rem;
+  border-radius: 999px;
+  background: var(--leaf);
 }
 
 .eyebrow,
@@ -100,12 +126,27 @@ textarea {
 }
 
 .range {
-  margin: 0.2rem 0 0;
-  color: var(--muted);
+  margin: 0;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.hero-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hero-title > div {
+  min-width: 0;
 }
 
 .score {
-  margin: 0;
+  flex: none;
+  margin: 1.15rem 0 0;
   font-size: 1.8rem;
   font-weight: 600;
   letter-spacing: -0.04em;
@@ -310,9 +351,7 @@ h1 {
 }
 
 .meta,
-.courses,
-.note-preview,
-footer p {
+.courses {
   margin: 0.7rem 0 0;
   color: var(--muted);
 }
@@ -377,6 +416,7 @@ footer p {
 
 :root[data-theme="light"] .hero .course-tag[data-course="python"],
 :root[data-theme="light"] .task .course-tag[data-course="python"],
+:root[data-theme="light"] .add .course-tag[data-course="python"],
 :root[data-theme="light"] .chip:not(.selected) .course-tag[data-course="python"] {
   border-color: rgb(23 100 63 / 22%);
   background: rgb(23 100 63 / 8%);
@@ -385,6 +425,7 @@ footer p {
 
 :root[data-theme="light"] .hero .course-tag[data-course="django"],
 :root[data-theme="light"] .task .course-tag[data-course="django"],
+:root[data-theme="light"] .add .course-tag[data-course="django"],
 :root[data-theme="light"] .chip:not(.selected) .course-tag[data-course="django"] {
   border-color: rgb(14 110 98 / 20%);
   background: rgb(14 110 98 / 8%);
@@ -393,6 +434,7 @@ footer p {
 
 :root[data-theme="light"] .hero .course-tag[data-course="backend"],
 :root[data-theme="light"] .task .course-tag[data-course="backend"],
+:root[data-theme="light"] .add .course-tag[data-course="backend"],
 :root[data-theme="light"] .chip:not(.selected) .course-tag[data-course="backend"] {
   border-color: rgb(36 78 104 / 20%);
   background: rgb(36 78 104 / 8%);
@@ -401,6 +443,7 @@ footer p {
 
 :root[data-theme="light"] .hero .course-tag[data-course="sql"],
 :root[data-theme="light"] .task .course-tag[data-course="sql"],
+:root[data-theme="light"] .add .course-tag[data-course="sql"],
 :root[data-theme="light"] .chip:not(.selected) .course-tag[data-course="sql"] {
   border-color: rgb(140 96 24 / 22%);
   background: rgb(184 132 32 / 10%);
@@ -477,14 +520,87 @@ ul {
 }
 
 .task {
+  position: relative;
   margin-top: 0.65rem;
   padding: 0.9rem 0.95rem;
   border-radius: 1rem;
-  animation: rise 0.4s ease both;
+  animation: task-in 0.4s ease;
   transition:
     border-color 0.25s ease,
     background 0.25s ease,
+    box-shadow 0.22s ease,
     opacity 0.25s ease;
+}
+
+.task-top {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.grip {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: var(--label);
+  cursor: move;
+  touch-action: none;
+}
+
+.grip svg {
+  width: 1.85rem;
+  height: 1.85rem;
+  fill: currentColor;
+}
+
+.grip:hover {
+  color: var(--text);
+}
+
+.task-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.45rem;
+}
+
+.remove {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--label);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.remove svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.remove:hover {
+  border-color: rgb(176 72 72 / 55%);
+  background: rgb(176 72 72 / 12%);
+  color: #c45c5c;
 }
 
 .task.done {
@@ -583,16 +699,12 @@ input[type="checkbox"]:indeterminate::after {
   transform: translate(-50%, -50%) rotate(0) scale(1);
 }
 
-.note-preview {
-  margin-left: 1.95rem;
-  white-space: pre-wrap;
-}
-
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 0.85rem;
-  margin: 0.45rem 0 0 1.95rem;
+  align-items: center;
+  margin-top: 0.45rem;
 }
 
 .actions button {
@@ -610,14 +722,56 @@ input[type="checkbox"]:indeterminate::after {
   color: var(--text);
 }
 
-.actions button:disabled {
-  opacity: 0.35;
-  cursor: default;
+.about {
+  display: inline-flex;
+  gap: 0.2rem;
+  align-items: center;
 }
 
-.rename,
-textarea {
-  width: 100%;
+.about svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.22s ease;
+}
+
+.about[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+
+.detail.open {
+  grid-template-rows: 1fr;
+}
+
+.detail-body {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.detail-body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.detail.open .detail-body p {
+  padding-top: 0.65rem;
+}
+
+.rename {
+  flex: 1;
+  width: auto;
+  min-width: 0;
   border: 0;
   border-bottom: 1px solid var(--line);
   background: transparent;
@@ -625,44 +779,82 @@ textarea {
   font: inherit;
 }
 
-textarea {
-  display: block;
-  margin-top: 0.65rem;
-  padding: 0.35rem 0;
-  resize: vertical;
-  animation: rise 0.25s ease both;
-}
-
 .add {
   display: flex;
-  gap: 0.4rem;
+  flex-wrap: wrap;
+  gap: 0.55rem;
   align-items: center;
   margin-top: 1rem;
-  padding: 0.28rem 0.28rem 0.28rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
+  padding: 0.55rem;
+  border: 1px solid rgb(157 204 170 / 42%);
+  border-radius: 1rem;
+  background: rgb(157 204 170 / 14%);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-.add:focus-within {
-  border-color: var(--leaf);
-  box-shadow: 0 0 0 3px rgb(42 131 95 / 22%);
+:root[data-theme="light"] .add {
+  border-color: rgb(18 84 79 / 28%);
+  background: rgb(42 131 95 / 10%);
 }
 
-.add input {
-  flex: 1;
+.add:focus-within {
+  border-color: var(--leaf);
+  box-shadow: 0 0 0 3px rgb(42 131 95 / 18%);
+}
+
+.add-courses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.course-pick {
+  position: relative;
+  margin-top: 0;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.course-pick.picked {
+  opacity: 1;
+}
+
+.course-pick input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.course-pick input:focus,
+.course-pick input:focus-visible {
+  outline: none;
+}
+
+.course-pick:has(input:focus-visible) {
+  outline: 2px solid var(--label);
+  outline-offset: 2px;
+}
+
+.add-title {
+  flex: 1 1 12rem;
   min-width: 0;
-  padding: 0.55rem 0;
+  padding: 0.45rem 0.35rem;
   border: 0;
   background: transparent;
   color: var(--text);
   font: inherit;
 }
 
-.add input::placeholder {
+.add-title:focus,
+.add-title:focus-visible {
+  outline: none;
+}
+
+.add-title::placeholder {
   color: var(--muted);
 }
 
@@ -773,36 +965,6 @@ textarea {
   color: var(--label);
 }
 
-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  margin-top: 1.15rem;
-}
-
-footer button,
-.import {
-  padding: 0.4rem 0.85rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    color 0.2s ease;
-}
-
-footer button:hover,
-.import:hover {
-  border-color: var(--leaf);
-  color: var(--text);
-}
-
-.import input,
 .sr {
   position: absolute;
   width: 1px;
@@ -817,6 +979,39 @@ input:focus-visible,
 textarea:focus-visible {
   outline: 2px solid var(--label);
   outline-offset: 3px;
+}
+
+@keyframes task-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+  animation: none;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.tasks.cdk-drop-list-dragging .task:not(.cdk-drag-placeholder):not(.cdk-drag-preview) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 1rem;
+  animation: none;
+  transition: none;
+  box-shadow:
+    0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 
 @keyframes rise {
