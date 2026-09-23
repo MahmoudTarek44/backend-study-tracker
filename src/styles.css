@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 :root {
   --ink: #092328;
@@ -13,24 +13,32 @@
   --track: rgb(9 35 40 / 65%);
   --on-accent: #e8f6ea;
   --page:
-    radial-gradient(820px 420px at 0% -10%, rgb(18 84 79 / 85%), transparent 60%),
-    radial-gradient(640px 360px at 100% 0%, rgb(42 131 95 / 35%), transparent 55%),
+    radial-gradient(
+      820px 420px at 0% -10%,
+      rgb(18 84 79 / 85%),
+      transparent 60%
+    ),
+    radial-gradient(
+      640px 360px at 100% 0%,
+      rgb(42 131 95 / 35%),
+      transparent 55%
+    ),
     var(--ink);
   color-scheme: dark;
-  font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
   font-size: 18px;
   line-height: 1.5;
   color: var(--text);
   background: var(--page);
 }
 
-:root[data-theme='light'] .hero,
-:root[data-theme='light'] .task,
-:root[data-theme='light'] .chip:not(.selected) {
+:root[data-theme="light"] .hero,
+:root[data-theme="light"] .task,
+:root[data-theme="light"] .chip:not(.selected) {
   box-shadow: 0 12px 28px rgb(18 84 79 / 7%);
 }
 
-:root[data-theme='light'] {
+:root[data-theme="light"] {
   --text: var(--ink);
   --muted: var(--deep);
   --label: var(--deep);
@@ -39,8 +47,16 @@
   --track: rgb(139 187 146 / 50%);
   --on-accent: #f4fbf6;
   --page:
-    radial-gradient(860px 440px at 0% -12%, rgb(139 187 146 / 75%), transparent 62%),
-    radial-gradient(680px 380px at 100% 0%, rgb(42 131 95 / 18%), transparent 58%),
+    radial-gradient(
+      860px 440px at 0% -12%,
+      rgb(139 187 146 / 75%),
+      transparent 62%
+    ),
+    radial-gradient(
+      680px 380px at 100% 0%,
+      rgb(42 131 95 / 18%),
+      transparent 58%
+    ),
     #eef6f1;
   color-scheme: light;
 }
@@ -123,7 +139,10 @@ textarea {
     0 8px 18px rgb(9 35 40 / 28%);
   cursor: pointer;
   flex: none;
-  transition: background 0.45s ease, box-shadow 0.45s ease, border-color 0.45s ease;
+  transition:
+    background 0.45s ease,
+    box-shadow 0.45s ease,
+    border-color 0.45s ease;
 }
 
 .theme-switch:active .theme-knob {
@@ -144,9 +163,17 @@ textarea {
 .theme-stars {
   inset: 0;
   background:
-    radial-gradient(circle at 74% 34%, var(--on-accent) 1.1px, transparent 1.5px),
+    radial-gradient(
+      circle at 74% 34%,
+      var(--on-accent) 1.1px,
+      transparent 1.5px
+    ),
     radial-gradient(circle at 64% 70%, var(--sage) 1px, transparent 1.4px),
-    radial-gradient(circle at 84% 64%, var(--on-accent) 0.8px, transparent 1.2px);
+    radial-gradient(
+      circle at 84% 64%,
+      var(--on-accent) 0.8px,
+      transparent 1.2px
+    );
   opacity: 0.9;
   transition: opacity 0.35s ease;
 }
@@ -160,7 +187,12 @@ textarea {
   place-items: center;
   overflow: hidden;
   border-radius: 50%;
-  background: radial-gradient(circle at 32% 30%, #ffffff, var(--sage) 58%, var(--leaf));
+  background: radial-gradient(
+    circle at 32% 30%,
+    #ffffff,
+    var(--sage) 58%,
+    var(--leaf)
+  );
   box-shadow:
     0 6px 14px rgb(9 35 40 / 35%),
     inset 0 0 0 1px rgb(255 255 255 / 45%);
@@ -180,7 +212,9 @@ textarea {
   height: 0.82rem;
   overflow: hidden;
   pointer-events: none;
-  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s cubic-bezier(0.34, 1.2, 0.64, 1);
 }
 
 .icon-moon {
@@ -203,7 +237,7 @@ textarea {
   stroke: none;
 }
 
-:root[data-theme='light'] .theme-switch {
+:root[data-theme="light"] .theme-switch {
   background:
     radial-gradient(circle at 78% 50%, rgb(42 131 95 / 22%), transparent 48%),
     linear-gradient(105deg, #f7fbf8, #cfe4d4 80%);
@@ -212,22 +246,27 @@ textarea {
     0 8px 18px rgb(18 84 79 / 12%);
 }
 
-:root[data-theme='light'] .theme-stars {
+:root[data-theme="light"] .theme-stars {
   opacity: 0;
 }
 
-:root[data-theme='light'] .theme-knob {
+:root[data-theme="light"] .theme-knob {
   left: calc(100% - 1.95rem - 0.22rem);
-  background: radial-gradient(circle at 32% 30%, #ffffff, #d7efe0 46%, var(--leaf));
+  background: radial-gradient(
+    circle at 32% 30%,
+    #ffffff,
+    #d7efe0 46%,
+    var(--leaf)
+  );
   transform: rotate(16deg);
 }
 
-:root[data-theme='light'] .icon-moon {
+:root[data-theme="light"] .icon-moon {
   opacity: 0;
   transform: translate(-50%, -50%) rotate(24deg) scale(0.55);
 }
 
-:root[data-theme='light'] .icon-sun {
+:root[data-theme="light"] .icon-sun {
   opacity: 1;
   transform: translate(-50%, -50%);
 }
@@ -313,7 +352,10 @@ a {
   font-weight: 600;
   text-decoration: none;
   box-shadow: 0 10px 28px rgb(42 131 95 / 28%);
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .continue:hover {
@@ -349,7 +391,10 @@ ul {
   padding: 0.9rem 0.95rem;
   border-radius: 1rem;
   animation: rise 0.4s ease both;
-  transition: border-color 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    opacity 0.25s ease;
 }
 
 .task.done {
@@ -370,11 +415,11 @@ ul {
   line-height: 1.35;
 }
 
-:root[data-theme='light'] input[type='checkbox'] {
+:root[data-theme="light"] input[type="checkbox"] {
   border-color: var(--deep);
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   display: grid;
   width: 1.2rem;
   height: 1.2rem;
@@ -386,22 +431,22 @@ input[type='checkbox'] {
   appearance: none;
 }
 
-input[type='checkbox']::after {
+input[type="checkbox"]::after {
   width: 0.28rem;
   height: 0.55rem;
   border: solid var(--on-accent);
   border-width: 0 2px 2px 0;
-  content: '';
+  content: "";
   transform: rotate(45deg) scale(0);
 }
 
-input[type='checkbox']:checked,
-input[type='checkbox']:indeterminate {
+input[type="checkbox"]:checked,
+input[type="checkbox"]:indeterminate {
   border-color: var(--leaf);
   background: var(--leaf);
 }
 
-input[type='checkbox']:checked::after {
+input[type="checkbox"]:checked::after {
   transform: rotate(45deg) scale(1);
   animation: pop 0.22s ease;
 }
@@ -465,7 +510,9 @@ textarea {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .add:focus-within {
@@ -498,7 +545,9 @@ textarea {
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, opacity 0.2s ease;
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .add button:hover:not(:disabled) {
@@ -531,7 +580,10 @@ textarea {
   border-radius: 0.8rem;
   color: var(--muted);
   text-decoration: none;
-  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .chip:hover {
@@ -584,7 +636,9 @@ footer button,
   font: inherit;
   font-size: 0.88rem;
   cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 footer button:hover,

@@ -1,12 +1,22 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, computed, inject, input, signal } from "@angular/core";
+import { RouterLink } from "@angular/router";
 
-import { allWeeks, findWeek, isCalendarWeek, months, planRange } from './curriculum';
-import { parseSavedPlan, StudyProgress, type DisplayTask } from './study-progress';
-import { Theme } from './theme';
+import {
+  allWeeks,
+  findWeek,
+  isCalendarWeek,
+  months,
+  planRange,
+} from "./curriculum";
+import {
+  parseSavedPlan,
+  StudyProgress,
+  type DisplayTask,
+} from "./study-progress";
+import { Theme } from "./theme";
 
 @Component({
-  selector: 'app-study-board',
+  selector: "app-study-board",
   imports: [RouterLink],
   template: `
     @if (week(); as current) {
@@ -22,14 +32,18 @@ import { Theme } from './theme';
               class="theme-switch"
               role="switch"
               [attr.aria-checked]="theme.light()"
-              [attr.aria-label]="theme.light() ? 'Switch to dark mode' : 'Switch to light mode'"
+              [attr.aria-label]="
+                theme.light() ? 'Switch to dark mode' : 'Switch to light mode'
+              "
               (click)="theme.toggle()"
             >
               <span class="theme-track" aria-hidden="true">
                 <span class="theme-stars"></span>
                 <span class="theme-knob">
                   <svg class="icon-moon" viewBox="0 0 24 24">
-                    <path d="M15.8 3.2a8.2 8.2 0 1 0 5.4 14.4A7.2 7.2 0 0 1 15.8 3.2z" />
+                    <path
+                      d="M15.8 3.2a8.2 8.2 0 1 0 5.4 14.4A7.2 7.2 0 0 1 15.8 3.2z"
+                    />
                   </svg>
                   <svg class="icon-sun" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="3.1" />
@@ -40,7 +54,9 @@ import { Theme } from './theme';
                 </span>
               </span>
             </button>
-            <p class="score">{{ weekState().done }}<span>/{{ weekState().total }}</span></p>
+            <p class="score">
+              {{ weekState().done }}<span>/{{ weekState().total }}</span>
+            </p>
           </div>
         </header>
 
@@ -80,12 +96,24 @@ import { Theme } from './theme';
                   <h1 id="next-task">Week {{ panel.number }} is finished.</h1>
                 }
 
-                <p class="meta">Week {{ panel.number }} · {{ panel.title }} · {{ panel.dates }}</p>
+                <p class="meta">
+                  Week {{ panel.number }} · {{ panel.title }} ·
+                  {{ panel.dates }}
+                </p>
 
                 @if (panel.courses.length) {
                   <p class="courses">
-                    @for (course of panel.courses; track course.url; let last = $last) {
-                      <a [href]="course.url" target="_blank" rel="noopener noreferrer">{{ course.title }}</a>
+                    @for (
+                      course of panel.courses;
+                      track course.url;
+                      let last = $last
+                    ) {
+                      <a
+                        [href]="course.url"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >{{ course.title }}</a
+                      >
                       @if (!last) {
                         <span aria-hidden="true"> · </span>
                       }
@@ -98,7 +126,13 @@ import { Theme } from './theme';
                 </div>
 
                 @if (nextTask() && panel.courses[0]; as course) {
-                  <a class="continue" [href]="course.url" target="_blank" rel="noopener noreferrer">Continue</a>
+                  <a
+                    class="continue"
+                    [href]="course.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Continue</a
+                  >
                 } @else if (nextOpenWeek(); as upcoming) {
                   <a class="continue" [routerLink]="['/weeks', upcoming.id]">
                     Continue with week {{ upcoming.number }}
@@ -121,8 +155,18 @@ import { Theme } from './theme';
               </div>
 
               <ul>
-                @for (task of tasks(); track task.id; let first = $first; let last = $last; let index = $index) {
-                  <li class="task" [class.done]="task.done" [style.animation-delay]="index * 45 + 'ms'">
+                @for (
+                  task of tasks();
+                  track task.id;
+                  let first = $first;
+                  let last = $last;
+                  let index = $index
+                ) {
+                  <li
+                    class="task"
+                    [class.done]="task.done"
+                    [style.animation-delay]="index * 45 + 'ms'"
+                  >
                     <div class="check">
                       <input
                         type="checkbox"
@@ -139,7 +183,9 @@ import { Theme } from './theme';
                           (keydown.enter)="saveRename(task.id, $event)"
                         />
                       } @else {
-                        <label [for]="'task-' + task.id">{{ task.title }}</label>
+                        <label [for]="'task-' + task.id">{{
+                          task.title
+                        }}</label>
                       }
                     </div>
 
@@ -148,11 +194,29 @@ import { Theme } from './theme';
                     }
 
                     <div class="actions">
-                      <button type="button" (click)="openNote(task)">Note</button>
-                      <button type="button" (click)="openRename(task)">Rename</button>
-                      <button type="button" (click)="move(task.id, -1)" [disabled]="first">Up</button>
-                      <button type="button" (click)="move(task.id, 1)" [disabled]="last">Down</button>
-                      <button type="button" (click)="remove(task.id)">Remove</button>
+                      <button type="button" (click)="openNote(task)">
+                        Note
+                      </button>
+                      <button type="button" (click)="openRename(task)">
+                        Rename
+                      </button>
+                      <button
+                        type="button"
+                        (click)="move(task.id, -1)"
+                        [disabled]="first"
+                      >
+                        Up
+                      </button>
+                      <button
+                        type="button"
+                        (click)="move(task.id, 1)"
+                        [disabled]="last"
+                      >
+                        Down
+                      </button>
+                      <button type="button" (click)="remove(task.id)">
+                        Remove
+                      </button>
                     </div>
 
                     @if (noteTaskId() === task.id) {
@@ -176,7 +240,9 @@ import { Theme } from './theme';
                   autocomplete="off"
                   (input)="onDraft($event)"
                 />
-                <button type="submit" [disabled]="!draftTitle().trim()">Add</button>
+                <button type="submit" [disabled]="!draftTitle().trim()">
+                  Add
+                </button>
               </form>
             </section>
 
@@ -184,7 +250,11 @@ import { Theme } from './theme';
               <button type="button" (click)="exportPlan()">Export</button>
               <label class="import">
                 Import
-                <input type="file" accept="application/json,.json" (change)="importPlan($event)" />
+                <input
+                  type="file"
+                  accept="application/json,.json"
+                  (change)="importPlan($event)"
+                />
               </label>
               @if (footerMessage()) {
                 <p>{{ footerMessage() }}</p>
@@ -216,10 +286,10 @@ export class StudyBoard {
   protected readonly planRange = planRange;
   protected readonly noteTaskId = signal<string | null>(null);
   protected readonly renameTaskId = signal<string | null>(null);
-  protected readonly footerMessage = signal('');
-  protected readonly draftTitle = signal('');
-  protected noteSeed = '';
-  protected renameSeed = '';
+  protected readonly footerMessage = signal("");
+  protected readonly draftTitle = signal("");
+  protected noteSeed = "";
+  protected renameSeed = "";
 
   protected readonly week = computed(() => findWeek(this.weekId()));
   protected readonly stage = computed(() => {
@@ -230,7 +300,9 @@ export class StudyBoard {
     const week = this.week();
     return week ? this.progress.tasksFor(week) : [];
   });
-  protected readonly nextTask = computed(() => this.tasks().find((task) => !task.done));
+  protected readonly nextTask = computed(() =>
+    this.tasks().find((task) => !task.done),
+  );
   protected readonly weekState = computed(() => {
     const tasks = this.tasks();
     const done = tasks.filter((task) => task.done).length;
@@ -244,7 +316,9 @@ export class StudyBoard {
   protected readonly nextOpenWeek = computed(() => {
     const weeks = allWeeks();
     const index = weeks.findIndex((week) => week.id === this.weekId());
-    return weeks.slice(index + 1).find((week) => !this.progress.isWeekComplete(week));
+    return weeks
+      .slice(index + 1)
+      .find((week) => !this.progress.isWeekComplete(week));
   });
 
   protected percent(): number {
@@ -259,7 +333,7 @@ export class StudyBoard {
   protected fraction(weekId: string): string {
     const week = findWeek(weekId);
     if (!week) {
-      return '';
+      return "";
     }
     const tasks = this.progress.tasksFor(week);
     const done = tasks.filter((task) => task.done).length;
@@ -273,7 +347,10 @@ export class StudyBoard {
   protected onWeekToggle(event: Event): void {
     const week = this.week();
     if (week) {
-      this.progress.setWeekDone(week, (event.target as HTMLInputElement).checked);
+      this.progress.setWeekDone(
+        week,
+        (event.target as HTMLInputElement).checked,
+      );
     }
   }
 
@@ -325,17 +402,17 @@ export class StudyBoard {
     }
     this.progress.addTask(week, this.draftTitle());
     form.reset();
-    this.draftTitle.set('');
+    this.draftTitle.set("");
   }
 
   protected exportPlan(): void {
     const blob = new Blob([JSON.stringify(this.progress.snapshot(), null, 2)], {
-      type: 'application/json',
+      type: "application/json",
     });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'backend-study-tracker.json';
+    link.download = "backend-study-tracker.json";
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -343,18 +420,18 @@ export class StudyBoard {
   protected importPlan(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    input.value = '';
+    input.value = "";
     if (!file) {
       return;
     }
     void file.text().then((raw) => {
       const plan = parseSavedPlan(raw);
       if (!plan) {
-        this.footerMessage.set('That file could not be read.');
+        this.footerMessage.set("That file could not be read.");
         return;
       }
       this.progress.replace(plan);
-      this.footerMessage.set('Progress replaced from the file.');
+      this.footerMessage.set("Progress replaced from the file.");
     });
   }
 }

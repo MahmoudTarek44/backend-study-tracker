@@ -1,8 +1,8 @@
-import { Service, signal } from '@angular/core';
+import { Service, signal } from "@angular/core";
 
-import { StudyWeek } from './curriculum';
+import { StudyWeek } from "./curriculum";
 
-const storageKey = 'django-study-tracker.v1';
+const storageKey = "django-study-tracker.v1";
 
 export interface AddedTask {
   id: string;
@@ -40,7 +40,7 @@ function emptyPlan(): SavedPlan {
 }
 
 function isSavedPlan(value: unknown): value is SavedPlan {
-  if (!value || typeof value !== 'object') {
+  if (!value || typeof value !== "object") {
     return false;
   }
   const plan = value as Partial<SavedPlan>;
@@ -48,18 +48,18 @@ function isSavedPlan(value: unknown): value is SavedPlan {
     plan.version === 1 &&
     Array.isArray(plan.doneIds) &&
     !!plan.notes &&
-    typeof plan.notes === 'object' &&
+    typeof plan.notes === "object" &&
     !!plan.titles &&
-    typeof plan.titles === 'object' &&
+    typeof plan.titles === "object" &&
     Array.isArray(plan.removedIds) &&
     Array.isArray(plan.added) &&
     !!plan.order &&
-    typeof plan.order === 'object'
+    typeof plan.order === "object"
   );
 }
 
 function readPlan(): SavedPlan {
-  if (typeof localStorage === 'undefined') {
+  if (typeof localStorage === "undefined") {
     return emptyPlan();
   }
   try {
@@ -87,19 +87,24 @@ export class StudyProgress {
     const seedIds = week.tasks
       .map((task) => task.id)
       .filter((id) => !saved.removedIds.includes(id));
-    const addedIds = saved.added.filter((task) => task.weekId === week.id).map((task) => task.id);
+    const addedIds = saved.added
+      .filter((task) => task.weekId === week.id)
+      .map((task) => task.id);
     const known = new Set([...seedIds, ...addedIds]);
     const ordered = (saved.order[week.id] ?? []).filter((id) => known.has(id));
-    const ids = [...ordered, ...[...seedIds, ...addedIds].filter((id) => !ordered.includes(id))];
+    const ids = [
+      ...ordered,
+      ...[...seedIds, ...addedIds].filter((id) => !ordered.includes(id)),
+    ];
 
     return ids.map((id) => {
       const seed = week.tasks.find((task) => task.id === id);
       const added = saved.added.find((task) => task.id === id);
       return {
         id,
-        title: saved.titles[id] ?? seed?.title ?? added?.title ?? '',
+        title: saved.titles[id] ?? seed?.title ?? added?.title ?? "",
         done: saved.doneIds.includes(id),
-        note: saved.notes[id] ?? '',
+        note: saved.notes[id] ?? "",
       };
     });
   }
@@ -121,7 +126,10 @@ export class StudyProgress {
     const ids = this.tasksFor(week).map((task) => task.id);
     const saved = this.state();
     const remaining = saved.doneIds.filter((id) => !ids.includes(id));
-    this.write({ ...saved, doneIds: done ? [...remaining, ...ids] : remaining });
+    this.write({
+      ...saved,
+      doneIds: done ? [...remaining, ...ids] : remaining,
+    });
   }
 
   setNote(id: string, note: string): void {
@@ -192,7 +200,10 @@ export class StudyProgress {
     const next = [...ids];
     const [moved] = next.splice(index, 1);
     next.splice(target, 0, moved);
-    this.write({ ...this.state(), order: { ...this.state().order, [week.id]: next } });
+    this.write({
+      ...this.state(),
+      order: { ...this.state().order, [week.id]: next },
+    });
   }
 
   replace(plan: SavedPlan): void {
@@ -201,7 +212,7 @@ export class StudyProgress {
 
   private write(plan: SavedPlan): void {
     this.state.set(plan);
-    if (typeof localStorage === 'undefined') {
+    if (typeof localStorage === "undefined") {
       return;
     }
     try {
