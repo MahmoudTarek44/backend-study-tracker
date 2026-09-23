@@ -12,7 +12,8 @@
     "build": "vite build",
     "watch": "vite build --watch",
     "test": "vitest",
-    "preview": "node dist/analog/server/index.mjs"
+    "preview": "node dist/analog/server/index.mjs",
+    "postinstall": "node scripts/patch-analog-windows-path.mjs"
   },
   "private": true,
   "dependencies": {
@@ -53,5 +54,12 @@
   "overrides": {
     "vite": "$vite",
     "vitest": "$vitest"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "esbuild@0.27.7": true,
+    "lmdb@3.5.6": true,
+    "msgpackr-extract@3.0.4": true,
+    "@parcel/watcher@2.6.0": true
   }
 }
